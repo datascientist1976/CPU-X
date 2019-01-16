@@ -17,14 +17,15 @@ script:
   - make -j$(nproc)
   - export BUILD_APPDIR=appdir
   - make DESTDIR=$(readlink -f $BUILD_APPDIR) install
-  #- cp -v "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" "$BUILD_APPDIR/"
-  #- cp -v "$BUILD_APPDIR/usr/share/icons/hicolor/96x96/apps/cpu-x.png" "$BUILD_APPDIR/"
+  - sed -i 's|/usr/bin/cpu-x|cpu-x|g' "$BUILD_APPDIR/usr/bin/cpu-x_polkit"
   - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/5/linuxdeployqt-5-x86_64.AppImage"
   - chmod a+x linuxdeployqt-5-x86_64.AppImage
+  - wget -c "https://gist.githubusercontent.com/X0rg/58446b4ca33ca3e77fe8eb54d6d79973/raw/AppRun.c"
+  - gcc AppRun.c -o "$BUILD_APPDIR/AppRun"
   - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-  - export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for naming the file
-  - ./linuxdeployqt-5-x86_64.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -bundle-non-qt-libs
-  - ./linuxdeployqt-5-x86_64.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -appimage
+  - export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
+  - ./linuxdeployqt-5-x86_64.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x-root.desktop" -bundle-non-qt-libs
+  - ./linuxdeployqt-5-x86_64.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x-root.desktop" -appimage
 
 after_success:
   - find appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
