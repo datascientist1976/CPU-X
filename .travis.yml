@@ -1,30 +1,36 @@
-sudo: required
-dist: xenial
 language: c
-compiler:
-- clang
-- gcc
-cache: ccache
-env:
-- CPUX_BCLK=100
+compiler: gcc
+sudo: require
+dist: xenial
 
 before_install:
-- curl http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/Release.key | sudo apt-key add -
-- echo "deb http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/ /" | sudo tee -a /etc/apt/sources.list
-- sudo apt-get update -qq
+  - curl http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/Release.key | sudo apt-key add -
+  - echo "deb http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/ /" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
 install:
-- sudo apt-get install -y -qq nasm gettext libjson-c-dev libncursesw5-dev libcpuid-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libcpuid14 libpci3 libprocps4
+  - sudo apt-get install -y -qq nasm gettext libjson-c-dev libncursesw5-dev libcpuid-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libcpuid14 libpci3 libprocps4
 before_script:
-- mkdir build
-- cd build
-- cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_GTK=0 -DCMAKE_INSTALL_PREFIX=/usr ..
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
 script:
-- make -j$(nproc)
-after_success:
-- sudo make -j$(nproc) install
-- sudo cpu-x --issue-fmt
+  - make -j$(nproc)
+  - export BUILD_APPDIR=appdir
+  - make DESTDIR=$(readlink -f $BUILD_APPDIR) install
+  #- cp -v "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" "$BUILD_APPDIR/"
+  #- cp -v "$BUILD_APPDIR/usr/share/icons/hicolor/96x96/apps/cpu-x.png" "$BUILD_APPDIR/"
+  - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+  - export VERSION=$(git rev-parse --short HEAD) # linuxdeployqt uses this for naming the file
+  - ./linuxdeployqt-continuous-x86_64.AppImage "$BUILD_APPDIR/cpu-x.desktop" -bundle-non-qt-libs
+  - ./linuxdeployqt-continuous-x86_64.AppImage "$BUILD_APPDIR/cpu-x.desktop" -appimage
 
-notifications:
-  slack:
-    on_success: change
-    on_failure: always
+after_success:
+  - find appdir -executable -type f -exec ldd {} \; | grep " => /usr" | cut -d " " -f 2-3 | sort | uniq
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh CPU-X*.AppImage*
+
+branches:
+  except:
+    - /^(?i:continuous)/
