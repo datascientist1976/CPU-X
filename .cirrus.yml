@@ -1,4 +1,7 @@
 task:
+  env:
+    CPUX_BCLK=100
+
   freebsd_instance:
     matrix:
       image: freebsd-12-0-release-amd64
