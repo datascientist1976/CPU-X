@@ -8,7 +8,8 @@ task:
     - pkg install -y cmake pkgconf gettext nasm ncurses libcpuid pciutils libstatgrab
 
   before_script:
-    - mkdir build && cd $_
+    - mkdir build
+    - cd build
     - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_GTK=0 -DCMAKE_INSTALL_PREFIX=/usr ..
 
   build_script:
