@@ -13,8 +13,8 @@ task:
     - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_GTK=0 -DCMAKE_INSTALL_PREFIX=/usr ..
 
   build_script:
-    - make -j$(nproc)
+    - make -j$(sysctl -n hw.ncpu)
 
   check_script:
-    - sudo make -j$(nproc) install
+    - sudo make -j$(sysctl -n hw.ncpu) install
     - sudo cpu-x --issue-fmt
