@@ -1,6 +1,3 @@
-env:
-  CPUX_BCLK=100
-
 task:
   freebsd_instance:
     matrix:
