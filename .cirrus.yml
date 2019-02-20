@@ -15,6 +15,6 @@ task:
   build_script:
     - make -j$(nproc)
 
-  after_success:
+  check_script:
     - sudo make -j$(nproc) install
     - sudo cpu-x --issue-fmt
