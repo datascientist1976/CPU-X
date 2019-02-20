@@ -8,13 +8,14 @@ task:
     - pkg install -y cmake pkgconf gettext nasm ncurses libcpuid pciutils libstatgrab
 
   before_script:
-    - mkdir build
-    - cd build
+    - mkdir build && cd $_
     - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_GTK=0 -DCMAKE_INSTALL_PREFIX=/usr ..
 
   build_script:
+    - cd build
     - make -j$(sysctl -n hw.ncpu)
 
   check_script:
+    - cd build
     - sudo make -j$(sysctl -n hw.ncpu) install
     - sudo cpu-x --issue-fmt
