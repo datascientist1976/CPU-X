@@ -1,5 +1,5 @@
 env:
-  - CPUX_BCLK=100
+  CPUX_BCLK=100
 
 task:
   freebsd_instance:
