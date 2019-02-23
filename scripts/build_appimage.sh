@@ -22,3 +22,7 @@ export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-
 ./linuxdeployqt-5-x86_64.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -bundle-non-qt-libs -appimage
 rm -rfv $BUILD_APPDIR/{etc,var}
 find $BUILD_APPDIR/
+
+wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+chmod +x upload.sh
+./upload.sh CPU-X*.AppImage*
