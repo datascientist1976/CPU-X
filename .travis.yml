@@ -19,11 +19,13 @@ before_script:
 script:
   - make -j$(nproc)
   - sudo make -j$(nproc) install
+  - make DESTDIR=$(readlink -f appdir) -j$(nproc) install
 after_success:
   - make test
   - sudo CPUX_BCLK=100 cpu-x --issue-fmt
   - cat /tmp/cpu-x.log
   - cat /tmp/cpu-x-daemon.log
+  - ../scripts/build_appimage.sh appdir
 
 notifications:
   slack:
