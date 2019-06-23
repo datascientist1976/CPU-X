@@ -30,8 +30,18 @@
 #include "gui_gtk.h"
 #include "gui_gtk_id.h"
 
+static GSettings *settings = NULL;
+
+static enum { AUTO, LIGHT, DARK } theme = AUTO;
+
 
 /************************* Public function *************************/
+void test_notify (gpointer data)
+{
+	opts->refr_time = g_settings_get_uint(settings, "refresh-time");
+	g_print("test_notify=%p ==> %u\n", data, opts->refr_time);
+	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, data, test_notify);
+}
 
 /* Start CPU-X in GTK mode */
 void start_gui_gtk(int *argc, char **argv[], Labels *data)
@@ -56,6 +66,15 @@ void start_gui_gtk(int *argc, char **argv[], Labels *data)
 		exit(EXIT_FAILURE);
 	}
 
+	settings = g_settings_new("cpu-x");
+	g_settings_delay(settings);
+	opts->refr_time = g_settings_get_uint(settings, "refresh-time");
+	theme = g_settings_get_enum(settings, "gui-theme");
+	opts->selected_page = g_settings_get_enum(settings, "default-tab");
+	opts->selected_core = g_settings_get_uint(settings, "default-cpu-core");
+	opts->bw_test = g_settings_get_uint(settings, "default-cache-test");
+	opts->with_daemon = g_settings_get_boolean(settings, "always-start-daemon");
+
 	get_widgets(builder, &glab);
 	g_object_unref(G_OBJECT(builder));
 	set_colors (&glab);
@@ -64,12 +83,20 @@ void start_gui_gtk(int *argc, char **argv[], Labels *data)
 	set_signals(&glab, data, &refr);
 	labels_free(data);
 
+	g_settings_bind(settings, "refresh-time", glab.refreshtime, "value", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "gui-theme", glab.theme, "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-tab", glab.defaulttab, "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-cpu-core", glab.defaultcore, "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-cache-test", glab.defaultcachetest, "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "always-start-daemon", glab.startdaemon, "active", G_SETTINGS_BIND_DEFAULT);
+
 #if 0 //PORTABLE_BINARY
 	if(PORTABLE_BINARY && (new_version[0] != NULL) && !opts->update)
 		new_version_window(glab.mainwindow);
 #endif /* PORTABLE_BINARY */
 
-	g_timeout_add_seconds(opts->refr_time, (gpointer)grefresh, &refr);
+	g_print("ptr=%p\n", &refr);
+	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, &refr, test_notify);
 	gtk_main();
 
 	if(data->reload)
@@ -148,7 +175,30 @@ static gboolean grefresh(GThrd *refr)
 			break;
 	}
 
-	return G_SOURCE_CONTINUE;
+	return (opts->refr_time == g_settings_get_uint(settings, "refresh-time"));
+}
+
+static void open_settings_window(GtkWidget *button, GtkLabels *glab)
+{
+	g_print("open_settings_window\n");
+	gtk_widget_show(GTK_WIDGET(glab->settingswindow));
+}
+
+static void close_settings_window(GtkWidget *button, GtkLabels *glab)
+{
+	g_print("close_settings_window\n");
+	g_settings_revert(settings);
+	gtk_widget_hide(GTK_WIDGET(glab->settingswindow));
+}
+
+static void save_settings(GtkWidget *button, GtkLabels *glab)
+{
+	g_print("save_settings\n");
+	g_print("test => %d / %s\n", g_settings_get_enum(settings, "gui-theme"), g_settings_get_string(settings, "gui-theme"));
+	theme = g_settings_get_enum(settings, "gui-theme");
+	set_colors(glab);
+	g_settings_apply(settings);
+	gtk_widget_hide(GTK_WIDGET(glab->settingswindow));
 }
 
 static void reload_with_daemon(GtkWidget *button, Labels *data)
@@ -278,6 +328,7 @@ static void get_widgets(GtkBuilder *builder, GtkLabels *glab)
 	int i;
 
 	glab->mainwindow  = GTK_WIDGET(gtk_builder_get_object(builder, "mainwindow"));
+	glab->settingsbutton = GTK_WIDGET(gtk_builder_get_object(builder, "settingsbutton"));
 	glab->daemonbutton = GTK_WIDGET(gtk_builder_get_object(builder, "daemonbutton"));
 	glab->labprgver	  = GTK_WIDGET(gtk_builder_get_object(builder, "labprgver"));
 	glab->footer      = GTK_WIDGET(gtk_builder_get_object(builder, "footer_box"));
@@ -287,6 +338,17 @@ static void get_widgets(GtkBuilder *builder, GtkLabels *glab)
 	glab->activetest  = GTK_WIDGET(gtk_builder_get_object(builder, "test_activetest"));
 	glab->logoprg     = GTK_WIDGET(gtk_builder_get_object(builder, "about_logoprg"));
 	glab->butcol      = GTK_WIDGET(gtk_builder_get_object(builder, "colorbutton"));
+
+	glab->settingswindow = GTK_WIDGET(gtk_builder_get_object(builder, "settingswindow"));
+	glab->validatebutton = GTK_WIDGET(gtk_builder_get_object(builder, "validatebutton"));
+	glab->cancelbutton   = GTK_WIDGET(gtk_builder_get_object(builder, "cancelbutton"));
+	glab->refreshtime    = GTK_WIDGET(gtk_builder_get_object(builder, "refreshtime_val"));
+	glab->theme    = GTK_WIDGET(gtk_builder_get_object(builder, "theme_val"));
+	glab->defaulttab = GTK_WIDGET(gtk_builder_get_object(builder, "defaulttab_val"));
+	glab->defaultcore = GTK_WIDGET(gtk_builder_get_object(builder, "defaultcore_val"));
+	glab->defaultcachetest = GTK_WIDGET(gtk_builder_get_object(builder, "defaultcachetest_val"));
+	glab->startdaemon = GTK_WIDGET(gtk_builder_get_object(builder, "startdaemon"));
+
 	gtk_widget_set_name(glab->footer, "footer_box");
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(glab->notebook), opts->selected_page);
 
@@ -301,7 +363,6 @@ static void get_widgets(GtkBuilder *builder, GtkLabels *glab)
 		glab->gtktab_cpu[VALUE][i] = GTK_WIDGET(gtk_builder_get_object(builder, get_id(objectcpu[i], "val")));
 		gtk_widget_set_name(glab->gtktab_cpu[VALUE][i], "value");
 	}
-
 
 	/* Tab Caches */
 	for(i = L1SIZE; i < LASTCACHES; i++)
@@ -370,6 +431,12 @@ static gboolean is_dark_theme(GtkLabels *glab)
 	gdouble contrast;
 	GdkRGBA *fg, *bg;
 	GtkStyleContext *context;
+
+	printf("is_dark_theme=%d\n", theme);
+	if(theme == DARK)
+		return true;
+	else if(theme == LIGHT)
+		return false;
 
 	context = gtk_widget_get_style_context(GTK_WIDGET(glab->mainwindow));
 	gtk_style_context_get(context, GTK_STATE_FLAG_NORMAL,
@@ -531,6 +598,17 @@ static void set_labels(GtkLabels *glab, Labels *data)
 	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMDURATION]), 1, 60 * 24);
 	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMTHREADS]),  1, data->cpu_count);
 
+	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->refreshtime),  1, G_MAXUSHORT);
+	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(glab->refreshtime),  1, 60);
+	gtk_combo_box_set_active(GTK_COMBO_BOX(glab->defaulttab), opts->selected_page);
+	for(i = 0; i < data->cpu_count; i++)
+		gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(glab->defaultcore), format(_("Core #%i"), i));
+	gtk_combo_box_set_active(GTK_COMBO_BOX(glab->defaultcore), opts->selected_core);
+	for(i = 0; i < data->w_data->test_count; i++)
+		gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(glab->defaultcachetest), data->w_data->test_name[i]);
+	gtk_combo_box_set_active(GTK_COMBO_BOX(glab->defaultcachetest), opts->bw_test);
+	gtk_widget_set_sensitive(GTK_WIDGET(glab->defaultcachetest), data->cache_count > 0);
+
 	/* Tab About */
 	for(i = DESCRIPTION; i < LASTABOUT; i++)
 		gtk_label_set_text(GTK_LABEL(glab->gtktab_about[i]), data->tab_about[i]);
@@ -542,6 +620,7 @@ static void set_signals(GtkLabels *glab, Labels *data, GThrd *refr)
 	int i;
 
 	g_signal_connect(glab->mainwindow,  "destroy", G_CALLBACK(gtk_main_quit),     NULL);
+	g_signal_connect(glab->settingsbutton, "clicked", G_CALLBACK(open_settings_window), glab);
 	g_signal_connect(glab->daemonbutton, "clicked", G_CALLBACK(reload_with_daemon), data);
 	g_signal_connect(glab->activecore,  "changed", G_CALLBACK(change_activecore), data);
 	g_signal_connect(glab->activetest,  "changed", G_CALLBACK(change_activetest), data);
@@ -553,6 +632,9 @@ static void set_signals(GtkLabels *glab, Labels *data, GThrd *refr)
 
 	for(i = BARUSED; i < LASTBAR; i++)
 		g_signal_connect(G_OBJECT(glab->bar[i]),  "draw", G_CALLBACK(fill_frame), refr);
+
+	g_signal_connect(glab->validatebutton, "clicked", G_CALLBACK(save_settings), glab);
+	g_signal_connect(glab->cancelbutton,   "clicked", G_CALLBACK(close_settings_window), glab);
 }
 
 /* Draw bars in Memory tab */

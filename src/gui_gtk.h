@@ -33,11 +33,23 @@ typedef struct
 {
 	/* Common */
 	GtkWidget *mainwindow;
+	GtkWidget *settingsbutton;
 	GtkWidget *notebook;
 	GtkWidget *footer;
 	GtkWidget *labprgver;
 	GtkWidget *daemonbutton;
 	GtkWidget *gtktrad[LASTOBJ];
+
+	/* Settings */
+	GtkWidget *settingswindow;
+	GtkWidget *validatebutton;
+	GtkWidget *cancelbutton;
+	GtkWidget *refreshtime;
+	GtkWidget *theme;
+	GtkWidget *defaulttab;
+	GtkWidget *defaultcore;
+	GtkWidget *defaultcachetest;
+	GtkWidget *startdaemon;
 
 	/* Tab CPU */
 	GtkWidget *logocpu;
