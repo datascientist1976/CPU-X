@@ -30,18 +30,8 @@
 #include "gui_gtk.h"
 #include "gui_gtk_id.h"
 
-static GSettings *settings = NULL;
-
-static enum { AUTO, LIGHT, DARK } theme = AUTO;
-
 
 /************************* Public function *************************/
-void test_notify (gpointer data)
-{
-	opts->refr_time = g_settings_get_uint(settings, "refresh-time");
-	g_print("test_notify=%p ==> %u\n", data, opts->refr_time);
-	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, data, test_notify);
-}
 
 /* Start CPU-X in GTK mode */
 void start_gui_gtk(int *argc, char **argv[], Labels *data)
@@ -56,6 +46,7 @@ void start_gui_gtk(int *argc, char **argv[], Labels *data)
 	MSG_VERBOSE(_("Starting GTK GUI..."));
 	gtk_init(argc, argv);
 	g_set_prgname(prgname);
+	settings = g_settings_new("cpu-x");
 	g_free(prgname);
 
 	/* Build UI from Glade file */
@@ -66,15 +57,16 @@ void start_gui_gtk(int *argc, char **argv[], Labels *data)
 		exit(EXIT_FAILURE);
 	}
 
-	settings = g_settings_new("cpu-x");
+	/* Apply settings */
 	g_settings_delay(settings);
-	opts->refr_time = g_settings_get_uint(settings, "refresh-time");
-	theme = g_settings_get_enum(settings, "gui-theme");
+	theme               = g_settings_get_enum(settings, "gui-theme");
+	opts->refr_time     = g_settings_get_uint(settings, "refresh-time");
 	opts->selected_page = g_settings_get_enum(settings, "default-tab");
 	opts->selected_core = g_settings_get_uint(settings, "default-cpu-core");
-	opts->bw_test = g_settings_get_uint(settings, "default-cache-test");
-	opts->with_daemon = g_settings_get_boolean(settings, "always-start-daemon");
+	opts->bw_test       = g_settings_get_uint(settings, "default-cache-test");
+	opts->with_daemon   = g_settings_get_boolean(settings, "always-start-daemon");
 
+	/* Set widgets */
 	get_widgets(builder, &glab);
 	g_object_unref(G_OBJECT(builder));
 	set_colors (&glab);
@@ -83,26 +75,25 @@ void start_gui_gtk(int *argc, char **argv[], Labels *data)
 	set_signals(&glab, data, &refr);
 	labels_free(data);
 
-	g_settings_bind(settings, "refresh-time", glab.refreshtime, "value", G_SETTINGS_BIND_DEFAULT);
-	g_settings_bind(settings, "gui-theme", glab.theme, "active-id", G_SETTINGS_BIND_DEFAULT);
-	g_settings_bind(settings, "default-tab", glab.defaulttab, "active-id", G_SETTINGS_BIND_DEFAULT);
-	g_settings_bind(settings, "default-cpu-core", glab.defaultcore, "active-id", G_SETTINGS_BIND_DEFAULT);
-	g_settings_bind(settings, "default-cache-test", glab.defaultcachetest, "active-id", G_SETTINGS_BIND_DEFAULT);
-	g_settings_bind(settings, "always-start-daemon", glab.startdaemon, "active", G_SETTINGS_BIND_DEFAULT);
+	/* Bind settings to get_widgets */
+	g_settings_bind(settings, "refresh-time",        glab.refreshtime,      "value",     G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "gui-theme",           glab.theme,            "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-tab",         glab.defaulttab,       "active-id", G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-cpu-core",    glab.defaultcore,      "active",    G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "default-cache-test",  glab.defaultcachetest, "active",    G_SETTINGS_BIND_DEFAULT);
+	g_settings_bind(settings, "always-start-daemon", glab.startdaemon,      "active",    G_SETTINGS_BIND_DEFAULT);
 
 #if 0 //PORTABLE_BINARY
 	if(PORTABLE_BINARY && (new_version[0] != NULL) && !opts->update)
 		new_version_window(glab.mainwindow);
 #endif /* PORTABLE_BINARY */
 
-	g_print("ptr=%p\n", &refr);
-	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, &refr, test_notify);
+	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, &refr, modify_refresh_time);
 	gtk_main();
 
 	if(data->reload)
 		execvp((*argv)[0], *argv);
 }
-
 
 /************************* Private functions *************************/
 
@@ -175,32 +166,41 @@ static gboolean grefresh(GThrd *refr)
 			break;
 	}
 
+	/* Destroy current timeout when refresh time is updated
+	Note: modify_refresh_time() will create a new timeout */
 	return (opts->refr_time == g_settings_get_uint(settings, "refresh-time"));
 }
 
+/* Create new timeout when old one is destroyed */
+static void modify_refresh_time(gpointer data)
+{
+	opts->refr_time = g_settings_get_uint(settings, "refresh-time");
+	g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, opts->refr_time, (gpointer)grefresh, data, modify_refresh_time);
+}
+
+/* Show settings window */
 static void open_settings_window(GtkWidget *button, GtkLabels *glab)
 {
-	g_print("open_settings_window\n");
 	gtk_widget_show(GTK_WIDGET(glab->settingswindow));
 }
 
+/* Hide settings window and revert changes */
 static void close_settings_window(GtkWidget *button, GtkLabels *glab)
 {
-	g_print("close_settings_window\n");
 	g_settings_revert(settings);
 	gtk_widget_hide(GTK_WIDGET(glab->settingswindow));
 }
 
+/* Hide settings window and apply changes */
 static void save_settings(GtkWidget *button, GtkLabels *glab)
 {
-	g_print("save_settings\n");
-	g_print("test => %d / %s\n", g_settings_get_enum(settings, "gui-theme"), g_settings_get_string(settings, "gui-theme"));
 	theme = g_settings_get_enum(settings, "gui-theme");
 	set_colors(glab);
 	g_settings_apply(settings);
 	gtk_widget_hide(GTK_WIDGET(glab->settingswindow));
 }
 
+/* Start daemon and reload CPU-X */
 static void reload_with_daemon(GtkWidget *button, Labels *data)
 {
 	gtk_widget_set_sensitive(button, false);
@@ -327,27 +327,27 @@ static void get_widgets(GtkBuilder *builder, GtkLabels *glab)
 {
 	int i;
 
-	glab->mainwindow  = GTK_WIDGET(gtk_builder_get_object(builder, "mainwindow"));
+	glab->mainwindow     = GTK_WIDGET(gtk_builder_get_object(builder, "mainwindow"));
 	glab->settingsbutton = GTK_WIDGET(gtk_builder_get_object(builder, "settingsbutton"));
-	glab->daemonbutton = GTK_WIDGET(gtk_builder_get_object(builder, "daemonbutton"));
-	glab->labprgver	  = GTK_WIDGET(gtk_builder_get_object(builder, "labprgver"));
-	glab->footer      = GTK_WIDGET(gtk_builder_get_object(builder, "footer_box"));
-	glab->notebook    = GTK_WIDGET(gtk_builder_get_object(builder, "header_notebook"));
-	glab->logocpu     = GTK_WIDGET(gtk_builder_get_object(builder, "proc_logocpu"));
-	glab->activecore  = GTK_WIDGET(gtk_builder_get_object(builder, "trg_activecore"));
-	glab->activetest  = GTK_WIDGET(gtk_builder_get_object(builder, "test_activetest"));
-	glab->logoprg     = GTK_WIDGET(gtk_builder_get_object(builder, "about_logoprg"));
-	glab->butcol      = GTK_WIDGET(gtk_builder_get_object(builder, "colorbutton"));
+	glab->daemonbutton   = GTK_WIDGET(gtk_builder_get_object(builder, "daemonbutton"));
+	glab->labprgver	     = GTK_WIDGET(gtk_builder_get_object(builder, "labprgver"));
+	glab->footer         = GTK_WIDGET(gtk_builder_get_object(builder, "footer_box"));
+	glab->notebook       = GTK_WIDGET(gtk_builder_get_object(builder, "header_notebook"));
+	glab->logocpu        = GTK_WIDGET(gtk_builder_get_object(builder, "proc_logocpu"));
+	glab->activecore     = GTK_WIDGET(gtk_builder_get_object(builder, "trg_activecore"));
+	glab->activetest     = GTK_WIDGET(gtk_builder_get_object(builder, "test_activetest"));
+	glab->logoprg        = GTK_WIDGET(gtk_builder_get_object(builder, "about_logoprg"));
+	glab->butcol         = GTK_WIDGET(gtk_builder_get_object(builder, "colorbutton"));
 
-	glab->settingswindow = GTK_WIDGET(gtk_builder_get_object(builder, "settingswindow"));
-	glab->validatebutton = GTK_WIDGET(gtk_builder_get_object(builder, "validatebutton"));
-	glab->cancelbutton   = GTK_WIDGET(gtk_builder_get_object(builder, "cancelbutton"));
-	glab->refreshtime    = GTK_WIDGET(gtk_builder_get_object(builder, "refreshtime_val"));
-	glab->theme    = GTK_WIDGET(gtk_builder_get_object(builder, "theme_val"));
-	glab->defaulttab = GTK_WIDGET(gtk_builder_get_object(builder, "defaulttab_val"));
-	glab->defaultcore = GTK_WIDGET(gtk_builder_get_object(builder, "defaultcore_val"));
+	glab->settingswindow   = GTK_WIDGET(gtk_builder_get_object(builder, "settingswindow"));
+	glab->validatebutton   = GTK_WIDGET(gtk_builder_get_object(builder, "validatebutton"));
+	glab->cancelbutton     = GTK_WIDGET(gtk_builder_get_object(builder, "cancelbutton"));
+	glab->refreshtime      = GTK_WIDGET(gtk_builder_get_object(builder, "refreshtime_val"));
+	glab->theme            = GTK_WIDGET(gtk_builder_get_object(builder, "theme_val"));
+	glab->defaulttab       = GTK_WIDGET(gtk_builder_get_object(builder, "defaulttab_val"));
+	glab->defaultcore      = GTK_WIDGET(gtk_builder_get_object(builder, "defaultcore_val"));
 	glab->defaultcachetest = GTK_WIDGET(gtk_builder_get_object(builder, "defaultcachetest_val"));
-	glab->startdaemon = GTK_WIDGET(gtk_builder_get_object(builder, "startdaemon"));
+	glab->startdaemon      = GTK_WIDGET(gtk_builder_get_object(builder, "startdaemon"));
 
 	gtk_widget_set_name(glab->footer, "footer_box");
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(glab->notebook), opts->selected_page);
@@ -432,11 +432,8 @@ static gboolean is_dark_theme(GtkLabels *glab)
 	GdkRGBA *fg, *bg;
 	GtkStyleContext *context;
 
-	printf("is_dark_theme=%d\n", theme);
-	if(theme == DARK)
-		return true;
-	else if(theme == LIGHT)
-		return false;
+	if (theme != AUTO)
+		return (theme == DARK);
 
 	context = gtk_widget_get_style_context(GTK_WIDGET(glab->mainwindow));
 	gtk_style_context_get(context, GTK_STATE_FLAG_NORMAL,
@@ -482,7 +479,6 @@ static void set_logos(GtkLabels *glab, Labels *data)
 	cpu_pixbuf     = gdk_pixbuf_new_from_file_at_scale(data_path(format("%s.png", data->tab_cpu[VALUE][VENDOR])), width, height, TRUE, &error);
 	unknown_pixbuf = gdk_pixbuf_new_from_file_at_scale(data_path("Unknown.png"), width, height, TRUE, NULL);
 	prg_pixbuf     = gdk_pixbuf_new_from_file_at_scale(data_path("CPU-X.png"), prg_size, prg_size, TRUE, NULL);
-
 
 	gtk_window_set_icon(GTK_WINDOW(glab->mainwindow),   prg_pixbuf);
 	gtk_image_set_from_pixbuf(GTK_IMAGE(glab->logocpu), cpu_pixbuf);
@@ -592,14 +588,20 @@ static void set_labels(GtkLabels *glab, Labels *data)
 		gtk_progress_bar_set_text(GTK_PROGRESS_BAR(glab->gtktab_bench[VALUE][i]), data->tab_bench[VALUE][i]);
 		gtk_widget_set_size_request(glab->gtktab_bench[VALUE][i], width1, -1);
 	}
-
 	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMDURATION]), 1, 60);
 	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMTHREADS]),  1, 1);
 	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMDURATION]), 1, 60 * 24);
 	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->gtktab_bench[VALUE][PARAMTHREADS]),  1, data->cpu_count);
 
+	/* Tab About */
+	for(i = DESCRIPTION; i < LASTABOUT; i++)
+		gtk_label_set_text(GTK_LABEL(glab->gtktab_about[i]), data->tab_about[i]);
+
+	/* Settings window */
 	gtk_spin_button_set_range     (GTK_SPIN_BUTTON(glab->refreshtime),  1, G_MAXUSHORT);
 	gtk_spin_button_set_increments(GTK_SPIN_BUTTON(glab->refreshtime),  1, 60);
+	for (i = NO_CPU; i <= NO_ABOUT; i++)
+		gtk_combo_box_text_insert(GTK_COMBO_BOX_TEXT(glab->defaulttab), i, nicktab[i], format(_("%s"), data->objects[i]));
 	gtk_combo_box_set_active(GTK_COMBO_BOX(glab->defaulttab), opts->selected_page);
 	for(i = 0; i < data->cpu_count; i++)
 		gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(glab->defaultcore), format(_("Core #%i"), i));
@@ -608,10 +610,6 @@ static void set_labels(GtkLabels *glab, Labels *data)
 		gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(glab->defaultcachetest), data->w_data->test_name[i]);
 	gtk_combo_box_set_active(GTK_COMBO_BOX(glab->defaultcachetest), opts->bw_test);
 	gtk_widget_set_sensitive(GTK_WIDGET(glab->defaultcachetest), data->cache_count > 0);
-
-	/* Tab About */
-	for(i = DESCRIPTION; i < LASTABOUT; i++)
-		gtk_label_set_text(GTK_LABEL(glab->gtktab_about[i]), data->tab_about[i]);
 }
 
 /* Call defined functions on signals */
@@ -619,20 +617,23 @@ static void set_signals(GtkLabels *glab, Labels *data, GThrd *refr)
 {
 	int i;
 
-	g_signal_connect(glab->mainwindow,  "destroy", G_CALLBACK(gtk_main_quit),     NULL);
+	g_signal_connect(glab->mainwindow,     "destroy", G_CALLBACK(gtk_main_quit),        NULL);
 	g_signal_connect(glab->settingsbutton, "clicked", G_CALLBACK(open_settings_window), glab);
-	g_signal_connect(glab->daemonbutton, "clicked", G_CALLBACK(reload_with_daemon), data);
-	g_signal_connect(glab->activecore,  "changed", G_CALLBACK(change_activecore), data);
-	g_signal_connect(glab->activetest,  "changed", G_CALLBACK(change_activetest), data);
+	g_signal_connect(glab->daemonbutton,   "clicked", G_CALLBACK(reload_with_daemon),   data);
+	g_signal_connect(glab->activecore,     "changed", G_CALLBACK(change_activecore),    data);
+	g_signal_connect(glab->activetest,     "changed", G_CALLBACK(change_activetest),    data);
 
+	/* Tab Bench */
 	g_signal_connect(glab->gtktab_bench[VALUE][PRIMESLOWRUN],  "button-press-event", G_CALLBACK(start_benchmark_bg), refr);
 	g_signal_connect(glab->gtktab_bench[VALUE][PRIMEFASTRUN],  "button-press-event", G_CALLBACK(start_benchmark_bg), refr);
 	g_signal_connect(glab->gtktab_bench[VALUE][PARAMDURATION], "value-changed",      G_CALLBACK(change_benchparam),  data);
 	g_signal_connect(glab->gtktab_bench[VALUE][PARAMTHREADS],  "value-changed",      G_CALLBACK(change_benchparam),  data);
 
+	/* Tab System */
 	for(i = BARUSED; i < LASTBAR; i++)
 		g_signal_connect(G_OBJECT(glab->bar[i]),  "draw", G_CALLBACK(fill_frame), refr);
 
+	/* Settings window */
 	g_signal_connect(glab->validatebutton, "clicked", G_CALLBACK(save_settings), glab);
 	g_signal_connect(glab->cancelbutton,   "clicked", G_CALLBACK(close_settings_window), glab);
 }

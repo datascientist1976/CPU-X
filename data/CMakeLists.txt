@@ -44,10 +44,6 @@ if(WITH_GTK)
 
 	# Install schema file
 	add_schema("cpu-x.gschema.xml")
-	# install(FILES
-	# 	cpu-x.gschema.xml
-	# 	DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/glib-2.0/schemas/
-	# )
 
 	add_subdirectory(icons)
 	add_subdirectory(logos)
