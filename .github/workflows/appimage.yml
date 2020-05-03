@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Test
-      run: ls * ls */*
+      run: ls * */*
     - name: Install packages
       run: sudo apt-get install -y --allow-unauthenticated -qq nasm gettext libjson-c-dev libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
     - name: Run CMake
