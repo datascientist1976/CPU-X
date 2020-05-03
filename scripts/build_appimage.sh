@@ -22,9 +22,10 @@ gcc AppRun.c -o "$BUILD_APPDIR/AppRun"
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="$GITHUB_SHA"
-./linuxdeployqt.AppImage "$BUILD_APPDIR/usr/bin/cpu-x" -appimage -bundle-non-qt-libs -verbose=3
+./linuxdeployqt.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -appimage -bundle-non-qt-libs -verbose=2
 #rm -rfv $BUILD_APPDIR/{etc,var}
 find $BUILD_APPDIR/
+find . -name '*.AppImage'
 
 # wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
 # chmod +x upload.sh
