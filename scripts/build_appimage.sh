@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BUILD_APPDIR="$1"
 
