@@ -1,0 +1,26 @@
+name: AppImage
+
+# on:
+#   push:
+#     branches: [ master ]
+
+jobs:
+  linux-appimage:
+    name: Linux (x64_64, AppImage)
+    runs-on: ubuntu-16.04
+    steps:
+    - name: Install packages
+      run: apt-get install -y --allow-unauthenticated -qq nasm gettext libjson-c-dev libncursesw5-dev libcpuid-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
+    - name: Run CMake
+      run: cmake -S . -B build -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBCPUID=0
+    - name: Build
+      run: cmake --build build
+    - name: Install
+      run: ninja install DESTDIR=AppDir
+    - name: Build AppImage
+      run: ./scripts/build_appimage.sh AppDir
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: CPU-X.AppImage
+        path: artifacts
