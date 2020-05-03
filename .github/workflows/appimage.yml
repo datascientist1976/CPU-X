@@ -25,5 +25,5 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: ./CPU-X-continuous-x86_64.AppImage
-        path: artifacts
+        name: CPU-X-continuous-x86_64.AppImage
+        path: ./

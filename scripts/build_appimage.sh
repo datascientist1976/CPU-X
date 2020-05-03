@@ -25,7 +25,7 @@ export VERSION="continuous"
 ./linuxdeployqt.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -appimage -bundle-non-qt-libs -verbose=2
 #rm -rfv $BUILD_APPDIR/{etc,var}
 find $BUILD_APPDIR/
-find . -name '*.AppImage'
+find . -name '*.AppImage' -exec realpath {} \;
 
 # wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
 # chmod +x upload.sh
