@@ -1,8 +1,8 @@
 name: AppImage
 
-# on:
-#   push:
-#     branches: [ master ]
+on:
+  push:
+    branches: [ githubci ]
 
 jobs:
   linux-appimage:
