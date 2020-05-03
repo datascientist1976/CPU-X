@@ -13,15 +13,15 @@ jobs:
     - name: Test
       run: ls * */*
     - name: Install packages
-      run: sudo apt-get install -y --allow-unauthenticated -qq cmake ninja nasm gettext libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
+      run: sudo apt-get install -y --allow-unauthenticated -qq cmake nasm gettext libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
     - name: Run CMake
-      run: sudo cmake -S . -B build -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBCPUID=0
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBCPUID=0
     - name: Build
-      run: sudo cmake --build build
+      run: cmake --build build
     - name: Install
-      run: sudo ninja install DESTDIR=AppDir
+      run: make install DESTDIR=AppDir
     - name: Build AppImage
-      run: sudo ./scripts/build_appimage.sh AppDir
+      run: ./scripts/build_appimage.sh AppDir
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
