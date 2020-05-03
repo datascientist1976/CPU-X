@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-16.04
     steps:
     - uses: actions/checkout@v2
-    - name: Test
-      run: ls * */*
+    - name: Add custom repo
+      run: curl http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/Release.key | sudo apt-key add - && echo "deb http://download.opensuse.org/repositories/home:/X0rg/xUbuntu_16.04/ /" | sudo tee -a /etc/apt/sources.list && sudo apt-get update -qq
     - name: Install packages
-      run: sudo apt-get install -y --allow-unauthenticated -qq cmake nasm gettext libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
+      run: sudo apt-get install -y --allow-unauthenticated -qq cmake nasm gettext libgtk-3-dev libncursesw5-dev libcpuid-dev libpci-dev libprocps-dev libarchive-dev libgtk-3-0 libncursesw5 libcpuid14 libpci3 libprocps4
     - name: Run CMake
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBCPUID=0
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
     - name: Build
       run: cmake --build build
     - name: Install
