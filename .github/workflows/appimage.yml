@@ -13,7 +13,7 @@ jobs:
     - name: Test
       run: ls * */*
     - name: Install packages
-      run: sudo apt-get install -y --allow-unauthenticated -qq nasm gettext libjson-c-dev libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
+      run: sudo apt-get install -y --allow-unauthenticated -qq cmake ninja nasm gettext libncursesw5-dev libpci-dev libprocps-dev libarchive-dev libncursesw5 libpci3 libprocps4
     - name: Run CMake
       run: cmake -S . -B build -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBCPUID=0
     - name: Build
