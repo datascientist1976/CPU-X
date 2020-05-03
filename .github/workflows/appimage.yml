@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: cmake --build build
     - name: Install
-      run: make -C build install DESTDIR=AppDir
+      run: make -C build install DESTDIR="$GITHUB_WORKSPACE/AppDir"
     - name: Build AppImage
       run: bash -x ./scripts/build_appimage.sh "$(realpath AppDir)"
     - name: Upload artifacts
