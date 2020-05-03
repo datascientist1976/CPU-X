@@ -20,11 +20,12 @@ wget -c "https://gist.githubusercontent.com/X0rg/58446b4ca33ca3e77fe8eb54d6d7997
 gcc AppRun.c -o "$BUILD_APPDIR/AppRun"
 
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
-./linuxdeployqt.AppImage --appdir "$BUILD_APPDIR" -bundle-non-qt-libs
+#export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
+export VERSION="$GITHUB_SHA"
+./linuxdeployqt.AppImage "$BUILD_APPDIR/usr/bin/cpu-x" -appimage -bundle-non-qt-libs -verbose=3
 #rm -rfv $BUILD_APPDIR/{etc,var}
 find $BUILD_APPDIR/
 
-wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-chmod +x upload.sh
-./upload.sh CPU-X*.AppImage*
+# wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+# chmod +x upload.sh
+# ./upload.sh CPU-X*.AppImage*
