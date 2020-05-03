@@ -1,6 +1,8 @@
 #!/bin/bash
 
 BUILD_APPDIR="$1"
+echo "BUILD_APPDIR=$BUILD_APPDIR"
+ls "$BUILD_APPDIR"
 
 #cp -v "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" "$BUILD_APPDIR/"
 #cp -v "$BUILD_APPDIR/usr/share/icons/hicolor/96x96/apps/cpu-x.png" "$BUILD_APPDIR/"
