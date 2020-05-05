@@ -15,13 +15,11 @@ ls "$BUILD_APPDIR"
 
 wget -c -nv -O "linuxdeployqt.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 chmod a+x "linuxdeployqt.AppImage"
-
-wget -c "https://gist.githubusercontent.com/X0rg/58446b4ca33ca3e77fe8eb54d6d79973/raw/AppRun.c"
-gcc AppRun.c -o "$BUILD_APPDIR/AppRun"
-
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
+cp -v "./scripts/app_run.sh" "$BUILD_APPDIR/AppRun"
 ./linuxdeployqt.AppImage "$BUILD_APPDIR/usr/share/applications/cpu-x.desktop" -appimage -bundle-non-qt-libs -verbose=2
 #rm -rfv $BUILD_APPDIR/{etc,var}
 find $BUILD_APPDIR/
