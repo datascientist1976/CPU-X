@@ -16,6 +16,7 @@ mkdir -pv "$APPDIR/$gtk_libdir" "$APPDIR/$gdk_pixbuf_dir" "$APPDIR/$terminfo_dir
 cp -Rv "$gtk_libdir/gtk-3.0" "$APPDIR/$gtk_libdir/"
 cp -Rv "$gdk_pixbuf_moduledir" "$gdk_pixbuf_cache_file" "$APPDIR/$gdk_pixbuf_dir/"
 cp -Rv "/usr/share/"{glib-2.0,terminfo} "$APPDIR/usr/share/"
+cp -v "/usr/lib/x86_64-linux-gnu/librsvg"* "$APPDIR/usr/lib/x86_64-linux-gnu/"
 cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 ./linuxdeployqt.AppImage "$APPDIR/usr/share/applications/cpu-x.desktop" -appimage -bundle-non-qt-libs -verbose=2
