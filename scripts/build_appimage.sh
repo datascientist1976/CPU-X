@@ -14,7 +14,7 @@ gdk_pixbuf_cache_file="$(pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-
 gdk_pixbuf_dir="$(dirname "$gdk_pixbuf_moduledir")"
 gsettings_schema_dir="$(pkg-config --variable=schemasdir gio-2.0)"
 terminfo_dir="$(pkg-config --variable=libdir tinfo)"
-mkdir -pv "$gdk_pixbuf_dir"
+mkdir -pv "$APPDIR/$gtk_libdir" "$APPDIR/$gdk_pixbuf_dir" "$APPDIR/$terminfo_dir" "$APPDIR/$gsettings_schema_dir"
 cp -Rv "$gtk_libdir/gtk-3.0" "$APPDIR/$gtk_libdir/"
 cp -Rv "$gdk_pixbuf_moduledir" "$gdk_pixbuf_cache_file" "$APPDIR/$gdk_pixbuf_dir/"
 cp -Rv "$terminfo_dir/terminfo" "$APPDIR/$terminfo_dir/"
