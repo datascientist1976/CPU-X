@@ -12,7 +12,7 @@ fi
 
 APPDIR="$(dirname "$(realpath "$0")")"
 _GDK_PIXBUF_MODULEDIR="/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders"
-export PATH="$APPDIR/usr/local/sbin:$APPDIR/usr/local/bin:$APPDIR/usr/sbin:$APPDIR/usr/bin:$APPDIR/sbin:$APPDIR/bin"
+export PATH="$APPDIR/usr/local/sbin:$APPDIR/usr/local/bin:$APPDIR/usr/sbin:$APPDIR/usr/bin:$APPDIR/sbin:$APPDIR/bin:$PATH"
 export LD_LIBRARY_PATH="$APPDIR/usr/lib/:$APPDIR/usr/lib/i386-linux-gnu/:$APPDIR/usr/lib/x86_64-linux-gnu/:$APPDIR/usr/lib32/:$APPDIR/usr/lib64/:$APPDIR/lib/:$APPDIR/lib/i386-linux-gnu/:$APPDIR/lib/x86_64-linux-gnu/:$APPDIR/lib32/:$APPDIR/lib64/:$APPDIR"
 export GTK_DATA_PREFIX="$APPDIR"
 export GTK_PATH="$APPDIR/usr/lib/gtk-3.0"
@@ -27,6 +27,9 @@ export XDG_DATA_DIRS="$APPDIR/usr/share"
 export TEXTDOMAINDIR="$APPDIR/usr/share/locale"
 export TERMINFO="$APPDIR/usr/share/terminfo"
 
-cd "$APPDIR"
+cd "$APPDIR/usr/share/glib-2.0/schemas/"
+glib-compile-schemas .
+
+cd "$APPDIR/"
 sed -i -e "s|$_GDK_PIXBUF_MODULEDIR|$GDK_PIXBUF_MODULEDIR|g" "$GDK_PIXBUF_MODULE_FILE"
 $EXEC "$APPDIR/usr/bin/cpu-x" "$@"
