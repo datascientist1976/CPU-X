@@ -12,7 +12,7 @@ gtk_libdir="$(pkg-config --variable=libdir gtk+-3.0)"
 gdk_pixbuf_moduledir="$(pkg-config --variable=gdk_pixbuf_moduledir gdk-pixbuf-2.0)"
 gdk_pixbuf_cache_file="$(pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-2.0)"
 gdk_pixbuf_dir="$(dirname "$gdk_pixbuf_moduledir")"
-gsettings_schema_dir="$(pkg-config --variable=schemasdir gio-2.0)"
+gsettings_schema_dir=${"$(pkg-config --variable=schemasdir gio-2.0)":-"/usr/share/glib-2.0/schemas"}
 terminfo_dir="$(pkg-config --variable=libdir tinfo)"
 mkdir -pv "$APPDIR/$gtk_libdir" "$APPDIR/$gdk_pixbuf_dir" "$APPDIR/$terminfo_dir" "$APPDIR/$gsettings_schema_dir"
 cp -Rv "$gtk_libdir/gtk-3.0" "$APPDIR/$gtk_libdir/"
