@@ -20,6 +20,7 @@ cp -Rv "$gdk_pixbuf_moduledir" "$gdk_pixbuf_cache_file" "$APPDIR/$gdk_pixbuf_dir
 cp -Rv "$terminfo_dir/terminfo" "$APPDIR/$terminfo_dir/"
 cp -v "$gsettings_schema_dir/"* "$APPDIR/$gsettings_schema_dir/"
 cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
+glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 ./linuxdeployqt.AppImage "$APPDIR/usr/share/applications/cpu-x.desktop" -appimage -bundle-non-qt-libs -verbose=2
 #rm -rfv $APPDIR/{etc,var}
 find $APPDIR/
