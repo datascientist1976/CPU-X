@@ -44,7 +44,8 @@ safeCopy "$gtk_libdir/gtk-2.0" \
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 
-runCmd wget -c -nv -O "linuxdeployqt.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+runCmd wget -c -nv -O "linuxdeployqt.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
+#runCmd wget -c -nv -O "linuxdeployqt.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 runCmd chmod a+x "linuxdeployqt.AppImage"
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 export ARCH=x86_64
