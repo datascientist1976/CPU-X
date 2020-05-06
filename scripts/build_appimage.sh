@@ -43,8 +43,9 @@ runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 
 #runCmd wget -c -nv -O "linuxdeploy.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
 #runCmd wget -c -nv -O "linuxdeploy.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+runCmd wget -c "https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh"
 runCmd wget -c -nv -O "linuxdeploy.AppImage" "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
-runCmd chmod a+x "linuxdeploy.AppImage"
+runCmd chmod -v a+x *.sh *.AppImage
 #unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
@@ -61,5 +62,6 @@ export VERBOSE=1
 ./linuxdeploy.AppImage \
 	--appdir="$APPDIR" \
 	--desktop-file="$APPDIR/usr/share/applications/cpu-x.desktop" \
+	--plugin gtk \
 	--output appimage \
 	--verbosity=1
