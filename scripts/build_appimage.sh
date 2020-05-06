@@ -55,4 +55,5 @@ runCmd ./linuxdeployqt.AppImage \
 	-appimage \
 	-extra-plugins=iconengines,platformthemes/libqgtk3.so \
 	-no-copy-copyright-files \
+	-unsupported-bundle-everything \
 	-verbose=2
