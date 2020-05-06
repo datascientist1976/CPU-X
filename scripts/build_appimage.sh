@@ -32,10 +32,13 @@ gsettings_schema_dir="/usr/share/glib-2.0/schemas"
 #cp -Rv "$gdk_pixbuf_moduledir" "$gdk_pixbuf_cache_file" "$APPDIR/$gdk_pixbuf_dir/"
 #cp -Rv "/usr/share/"{glib-2.0,terminfo,themes} "$APPDIR/usr/share/"
 #cp -v "/usr/lib/x86_64-linux-gnu/librsvg"* "$APPDIR/usr/lib/x86_64-linux-gnu/"
-safeCopy "$gtk_libdir/gtk-3.0" \
+safeCopy "$gtk_libdir/gtk-2.0" \
+	"$gtk_libdir/gtk-3.0" \
 	"$gdk_pixbuf_moduledir" \
 	"$gdk_pixbuf_cache_file" \
-	"/usr/share/"{glib-2.0,terminfo,themes} \
+	"/usr/share/"{glib-2.0,icons,terminfo,themes} \
+	"/usr/lib/gnome-settings-daemon-3.0" \
+	"/usr/lib/libgdk_pixbuf-2.0"* \
 	"/usr/lib/x86_64-linux-gnu/librsvg"* \
 	"$APPDIR"
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
@@ -46,4 +49,9 @@ runCmd chmod a+x "linuxdeployqt.AppImage"
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
-runCmd ./linuxdeployqt.AppImage "$APPDIR/usr/share/applications/cpu-x.desktop" -appimage -extra-plugins=iconengines,platformthemes/libqgtk3.so -verbose=2
+runCmd ./linuxdeployqt.AppImage \
+	"$APPDIR/usr/share/applications/cpu-x.desktop" \
+	-appimage \
+	-extra-plugins=iconengines,platformthemes/libqgtk3.so \
+	-no-copy-copyright-files \
+	-verbose=2

@@ -20,7 +20,10 @@ safeExport() {
 				die "$msg"
 			fi
 			ok=true
+		fi
 	done
+
+	export "$expr"
 }
 
 if [[ -n "$CPUX_APPIMAGE_DEBUG" ]]; then
