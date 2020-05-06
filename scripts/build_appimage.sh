@@ -47,6 +47,7 @@ runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 runCmd wget -c -nv -O "linuxdeployqt.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
 runCmd chmod a+x "linuxdeployqt.AppImage"
 unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
 runCmd ./linuxdeployqt.AppImage \
