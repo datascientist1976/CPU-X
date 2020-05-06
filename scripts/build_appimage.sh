@@ -29,6 +29,7 @@ safeCopy \
 	"/usr/$LIBARCHDIR/"{gdk-pixbuf-2.0,gtk-3.0,libgtk-3-0} \
 	"/usr/$LIBARCHDIR/libgdk_pixbuf"* \
 	"/usr/$LIBARCHDIR/libgobject"* \
+	"/usr/$LIBARCHDIR/libgio"* \
 	"$APPDIR"
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 runCmd glib-compile-schemas "$APPDIR/usr/share/glib-2.0/schemas"
