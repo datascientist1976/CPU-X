@@ -55,4 +55,4 @@ export VERSION="continuous"
 	-appimage \
 	-unsupported-bundle-everything \
 	-no-copy-copyright-files \
-	-verbose=2
+	-verbose=2 || true
