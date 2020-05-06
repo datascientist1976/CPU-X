@@ -40,6 +40,7 @@ safeCopy "$gtk_libdir/gtk-2.0" \
 	"/usr/lib/gnome-settings-daemon-3.0" \
 	"/usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0"* \
 	"/usr/lib/x86_64-linux-gnu/librsvg"* \
+	"/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so"* \
 	"$APPDIR"
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
