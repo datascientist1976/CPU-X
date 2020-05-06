@@ -62,6 +62,5 @@ export VERBOSE=1
 ./linuxdeploy.AppImage \
 	--appdir="$APPDIR" \
 	--desktop-file="$APPDIR/usr/share/applications/cpu-x.desktop" \
-	--plugin gtk \
 	--output appimage \
 	--verbosity=1
