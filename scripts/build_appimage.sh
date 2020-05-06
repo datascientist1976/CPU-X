@@ -32,13 +32,13 @@ gsettings_schema_dir="/usr/share/glib-2.0/schemas"
 #cp -Rv "$gdk_pixbuf_moduledir" "$gdk_pixbuf_cache_file" "$APPDIR/$gdk_pixbuf_dir/"
 #cp -Rv "/usr/share/"{glib-2.0,terminfo,themes} "$APPDIR/usr/share/"
 #cp -v "/usr/lib/x86_64-linux-gnu/librsvg"* "$APPDIR/usr/lib/x86_64-linux-gnu/"
-# safeCopy \
-# 	"$gtk_libdir/gtk-3.0" \
-# 	"$gdk_pixbuf_moduledir" \
-# 	"$gdk_pixbuf_cache_file" \
-# 	"/usr/share/"{glib-2.0,icons,terminfo,themes} \
-# 	"$APPDIR"
-#runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
+safeCopy \
+	"$gtk_libdir/gtk-3.0" \
+	"$gdk_pixbuf_moduledir" \
+	"$gdk_pixbuf_cache_file" \
+	"/usr/share/"{glib-2.0,icons,terminfo,themes} \
+	"$APPDIR"
+runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 #runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 
 #runCmd wget -c -nv -O "linuxdeploy.AppImage" "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
