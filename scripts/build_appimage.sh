@@ -38,7 +38,7 @@ safeCopy "$gtk_libdir/gtk-2.0" \
 	"$gdk_pixbuf_cache_file" \
 	"/usr/share/"{glib-2.0,icons,terminfo,themes} \
 	"/usr/lib/gnome-settings-daemon-3.0" \
-	"/usr/lib/libgdk_pixbuf-2.0"* \
+	"/usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0"* \
 	"/usr/lib/x86_64-linux-gnu/librsvg"* \
 	"$APPDIR"
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
