@@ -40,8 +40,6 @@ CACHEDIR="$(mktemp --tmpdir --directory CPU-X.XXXXXXXX)"
 
 export GTK_THEME=Adwaita
 export GDK_BACKEND=x11
-safeExport GTK_MODULES="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-2.0/modules"
-safeExport GTK3_MODULES="$APPDIR/usr/lib/gnome-settings-daemon-3.0/gtk-modules"
 safeExport GTK_DATA_PREFIX="$APPDIR"
 safeExport GTK_EXE_PREFIX="$APPDIR/usr"
 safeExport GTK_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0"
