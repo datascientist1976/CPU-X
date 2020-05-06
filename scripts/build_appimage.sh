@@ -53,6 +53,8 @@ export VERSION="continuous"
 # set environment variable to embed update information in an AppImage
 #export UPDATE_INFORMATION="zsync|https://foo.bar/myappimage-latest.AppImage.zsync"
 export VERBOSE=1
+export NO_STRIP=1
+export DISABLE_COPYRIGHT_FILES_DEPLOYMENT=1
 # ./linuxdeploy.AppImage \
 # 	"$APPDIR/usr/share/applications/cpu-x.desktop" \
 # 	-appimage \
