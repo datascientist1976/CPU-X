@@ -49,6 +49,9 @@ runCmd chmod a+x "linuxdeploy.AppImage"
 export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
+# set environment variable to embed update information in an AppImage
+#export UPDATE_INFORMATION="zsync|https://foo.bar/myappimage-latest.AppImage.zsync"
+export VERBOSE=1
 # ./linuxdeploy.AppImage \
 # 	"$APPDIR/usr/share/applications/cpu-x.desktop" \
 # 	-appimage \
@@ -58,4 +61,5 @@ export VERSION="continuous"
 ./linuxdeploy.AppImage \
 	--appdir="$APPDIR" \
 	--desktop-file="$APPDIR/usr/share/applications/cpu-x.desktop" \
+	--output appimage \
 	--verbosity=1
