@@ -53,5 +53,6 @@ export VERSION="continuous"
 ./linuxdeployqt.AppImage \
 	"$APPDIR/usr/share/applications/cpu-x.desktop" \
 	-appimage \
+	-unsupported-bundle-everything \
 	-no-copy-copyright-files \
 	-verbose=2
