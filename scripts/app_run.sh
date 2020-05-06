@@ -62,7 +62,7 @@ gtk-query-immodules-3.0 "$GTK_IM_MODULE_DIR/"* > "$GTK_IM_MODULE_FILE"
 gdk-pixbuf-query-loaders "$GDK_PIXBUF_MODULEDIR/"* > "$GDK_PIXBUF_MODULE_FILE"
 
 cd "$APPDIR/"
-if [ -e "$APPDIR/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2" ] ; then
+if [ -e "$APPDIR/lib/ld-linux.so.2" ] ; then
 	echo "Run experimental bundle that bundles everything"
 	export GCONV_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/gconv"
 	export FONTCONFIG_FILE="$APPDIR/etc/fonts/fonts.conf"
@@ -77,7 +77,7 @@ if [ -e "$APPDIR/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2" ] ; then
 	export LIBRARY_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/pulseaudio":$LIBRARY_PATH
 	export LIBRARY_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/alsa-lib":$LIBRARY_PATH
 	export LIBRARY_PATH=$GDK_PIXBUF_MODULEDIR:$LIBRARY_PATH # Otherwise getting "Unable to load image-loading module"
-	$EXEC "$APPDIR/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2" --inhibit-cache --library-path "$LIBRARY_PATH" "$APPDIR/usr/bin/cpu-x" "$@"
+	$EXEC "$APPDIR/lib/ld-linux.so.2" --inhibit-cache --library-path "$LIBRARY_PATH" "$APPDIR/usr/bin/cpu-x" "$@"
 else
 	$EXEC "$APPDIR/usr/bin/cpu-x" "$@"
 fi
