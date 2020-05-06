@@ -37,13 +37,13 @@ else
 fi
 
 gsettings get org.gnome.desktop.interface gtk-theme 2> /dev/null | grep -qi "dark" && GTK_THEME_VARIANT="dark" || GTK_THEME_VARIANT="light"
-APPDIR=${"$APPDIR":-"$(dirname "$(realpath "$0")")"}
+APPDIR=${APPDIR:-"$(dirname "$(realpath "$0")")"}
 CACHEDIR="$(mktemp --tmpdir --directory CPU-X.XXXXXXXX)"
 LIBARCHDIR="lib/x86_64-linux-gnu"
-CPUX_GTK_THEME=${"$CPUX_GTK_THEME":-"Adwaita:$GTK_THEME_VARIANT"}
+CPUX_GTK_THEME=${CPUX_GTK_THEME:-"Adwaita:$GTK_THEME_VARIANT"}
 
 export GTK_THEME="$CPUX_GTK_THEME"
-export GDK_BACKEND=x11
+export GDK_BACKEND=x11 # Crash with Wayland backend on Wayland
 safeExport GTK_DATA_PREFIX="$APPDIR"
 safeExport GTK_EXE_PREFIX="$APPDIR/usr"
 safeExport GTK_PATH="$APPDIR/usr/$LIBARCHDIR/gtk-3.0"
