@@ -33,14 +33,14 @@ gsettings_schema_dir="/usr/share/glib-2.0/schemas"
 #cp -Rv "/usr/share/"{glib-2.0,terminfo,themes} "$APPDIR/usr/share/"
 #cp -v "/usr/lib/x86_64-linux-gnu/librsvg"* "$APPDIR/usr/lib/x86_64-linux-gnu/"
 safeCopy \
-	"$gtk_libdir/gtk-3.0" \
+	"$gtk_libdir/"{gtk-2.0,gtk-3.0} \
 	"$gdk_pixbuf_moduledir" \
 	"$gdk_pixbuf_cache_file" \
 	"/usr/share/"{glib-2.0,icons,terminfo,themes} \
 	"/usr/lib/x86_64-linux-gnu/libgdk_pixbuf"* \
 	"/usr/lib/x86_64-linux-gnu/libgobject"* \
 	"/usr/lib/x86_64-linux-gnu/libcanberra"* \
-	"/usr/lib/gnome-settings-daemon-3.0/gtk-modules" \
+	"/usr/lib/gnome-settings-daemon-3.0" \
 	"$APPDIR"
 runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 #runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"

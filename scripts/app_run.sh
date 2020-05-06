@@ -35,12 +35,15 @@ if [[ -n "$CPUX_APPIMAGE_GDB" ]]; then
 else
 	EXEC=exec
 fi
-
+echo "APPDIR=$APPDIR"
 APPDIR="$(dirname "$(realpath "$0")")"
 CACHEDIR="$(mktemp --tmpdir --directory CPU-X.XXXXXXXX)"
 _GTK_IM_DIR="/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0"
 _GDK_PIXBUF_DIR="/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0"
-export GTK_THEME=Adwaita
+#export GTK_THEME=Adwaita
+export GDK_BACKEND=x11
+safeExport GTK_MODULES="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-2.0/modules"
+safeExport GTK3_MODULES="$APPDIR/usr/lib/gnome-settings-daemon-3.0/gtk-modules"
 safeExport GTK_DATA_PREFIX="$APPDIR"
 safeExport GTK_EXE_PREFIX="$APPDIR/usr"
 safeExport GTK_PATH="$APPDIR/usr/lib/x86_64-linux-gnu/gtk-3.0"
