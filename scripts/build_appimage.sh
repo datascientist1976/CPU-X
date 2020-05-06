@@ -51,8 +51,8 @@ export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
 ./linuxdeployqt.AppImage \
-	"$APPDIR/usr/share/applications/cpu-x.desktop" \
+	--appimage-extract-and-run "$APPDIR/usr/share/applications/cpu-x.desktop" \
+	-executable="$APPDIR/usr/bin/cpu-x" \
 	-appimage \
 	-unsupported-bundle-everything \
-	-no-copy-copyright-files \
-	-verbose=2 || true
+	-verbose=2
