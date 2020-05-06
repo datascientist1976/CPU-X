@@ -38,7 +38,7 @@ runCmd cp -v "./scripts/app_run.sh" "$APPDIR/AppRun"
 runCmd glib-compile-schemas "$APPDIR/$gsettings_schema_dir"
 
 runCmd wget -c -nv -O "linuxdeploy.AppImage" "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
-runCmd chmod -v a+x *.sh *.AppImage
+runCmd chmod -v a+x *.AppImage
 export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
