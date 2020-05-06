@@ -50,10 +50,9 @@ unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
 export ARCH=x86_64
 #export VERSION=$(git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g') # linuxdeployqt uses this for naming the file
 export VERSION="continuous"
-runCmd ./linuxdeployqt.AppImage \
-	"$APPDIR/usr/share/applications/cpu-x.desktop" \
+./linuxdeployqt.AppImage \
+	--appimage-extract-and-run "$APPDIR/usr/share/applications/cpu-x.desktop" \
 	-appimage \
-	-extra-plugins=iconengines,platformthemes/libqgtk3.so \
-	-no-copy-copyright-files \
 	-unsupported-bundle-everything \
+	-no-copy-copyright-files \
 	-verbose=2
